@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
+import CSSModules from 'react-css-modules'
 import styles from './css/Calendar.css';
+
+import isToday from './lib/date_util.js';
+import Button from './Button'
 
 class Calendar extends Component {
 
@@ -25,20 +29,9 @@ class Calendar extends Component {
     }
   }
 
-  handleChangeCalendarPage = (event) => {
-    let page = event.currentTarget.getAttribute("data-page")
-    let tmpMonth = this.state.month + parseInt(page)
-    let fullDate = this.state.fullDate
-    fullDate.setMonth(tmpMonth-1)
-    const year = fullDate.getFullYear()
-    let month =fullDate.getMonth()+1
-    console.log(fullDate)
-    console.log(month)
-
+  updateCalendarDate = (year, month) => {
     const endMonthDate = new Date(year, month, 0).getDate()
     const startDateWeek = new Date(year, month-1, 1).getDay()
-
-    console.log("handleChangeCalendarPage: " + startDateWeek)
 
     this.setState({
       year: year,
@@ -47,7 +40,7 @@ class Calendar extends Component {
       endMonthDate: endMonthDate
     })
   }
- 
+
   render() {
     const styles = {
       calendar: {
@@ -56,7 +49,6 @@ class Calendar extends Component {
       },
       calendarCell: {
         padding: "10px",
-        border: "1px solid #333"
       },
       buttonWrapper: {
         overflow: "hidden"
@@ -75,15 +67,11 @@ class Calendar extends Component {
     })
 
     return (
-      <div style={styles.calendar}>
-        <h1>カレンダーサンプル</h1>
+      <div styleName='calendar'>
         <h2>{this.state.year}年{this.state.month}月</h2>
-        <div style={styles.buttonWrapper}>
-          <button style={styles.buttonLeft} onClick={this.handleChangeCalendarPage} data-page="-1">前</button>
-          <button style={styles.buttonRight} onClick={this.handleChangeCalendarPage} data-page="1">次</button>
-        </div>
+        <Button fullDate={this.state.fullDate} updateCalendarDate={this.updateCalendarDate}/>
         <div className="date"></div>
-        <table>
+        <table styleName="calendar--tbl">
           <tbody>
             <tr>
               {weekHtml}
@@ -112,7 +100,11 @@ class Calendar extends Component {
           return(<td></td>)
         }else{
           date += 1
-          return(<td>{date}</td>)
+          let style=""
+          if(isToday(this.state.year, this.state.month, date)) {
+            style="today"
+          }
+          return(<td styleName={style}>{date}</td>)
         }
       })
       tr.push(<tr>{tds}</tr>)
@@ -121,4 +113,4 @@ class Calendar extends Component {
   }
 }
 
-export default Calendar;
+export default CSSModules(Calendar, styles);
