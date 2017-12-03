@@ -4,6 +4,7 @@ import styles from './css/Calendar.css';
 
 import isToday from './lib/date_util.js';
 import Button from './Button'
+import DateCell from './DateCell'
 
 class Calendar extends Component {
 
@@ -19,6 +20,7 @@ class Calendar extends Component {
     const startDateWeek = new Date(now.getFullYear(), month-1, 1).getDay()
 
     this.week = ["日","月","火","水","木","金","土"]
+    this.date = 0
 
     this.state = {
       year: year,
@@ -32,6 +34,7 @@ class Calendar extends Component {
   updateCalendarDate = (year, month) => {
     const endMonthDate = new Date(year, month, 0).getDate()
     const startDateWeek = new Date(year, month-1, 1).getDay()
+    this.date = 0
 
     this.setState({
       year: year,
@@ -66,6 +69,7 @@ class Calendar extends Component {
       weekHtml.push(<td style={styles.calendarCell}>{v}</td>)
     })
 
+
     return (
       <div styleName='calendar'>
         <h2>{this.state.year}年{this.state.month}月</h2>
@@ -76,40 +80,43 @@ class Calendar extends Component {
             <tr>
               {weekHtml}
             </tr>
-            {this.renderDateTable()}
+            <tr>
+              {this.renderBlankTable(1)}
+            </tr>
+            <tr>
+              {this.renderBlankTable(2)}
+            </tr>
+            <tr>
+              {this.renderBlankTable(3)}
+            </tr>
+            <tr>
+              {this.renderBlankTable(4)}
+            </tr>
+            <tr>
+              {this.renderBlankTable(5)}
+            </tr>
+            <tr>
+              {this.renderBlankTable(6)}
+            </tr>
           </tbody>
         </table>
       </div>
     );
   }
-  renderDateTable() {
-    let tr = []
+
+  renderBlankTable(row) {
     let td = []
-    let tds = []
-    let calendarRow = Math.ceil(this.state.endMonthDate / 7) + this.state.startDateWeek
-    let date = 0
-    console.log(calendarRow)
-    for(let i=0; i<calendarRow; i++) {
-      tds = this.week.map((v, index) => {
-        //カレンダー1行目
-        if(i === 0 && index < this.state.startDateWeek) {
-          return(<td></td>)
-        //最後の行
-        }else if(date >= this.state.endMonthDate) {
-          date += 1
-          return(<td></td>)
-        }else{
-          date += 1
-          let style=""
-          if(isToday(this.state.year, this.state.month, date)) {
-            style="today"
-          }
-          return(<td styleName={style}>{date}</td>)
-        }
-      })
-      tr.push(<tr>{tds}</tr>)
-    }
-    return tr
+    this.week.forEach((v, index) => {
+      if(row === 1 && index < this.state.startDateWeek) {
+        td.push(<DateCell date="" />)
+      }else if(this.date >= this.state.endMonthDate) {
+        td.push(<DateCell date="" />)
+      }else{
+        this.date += 1
+        td.push(<DateCell year={this.state.year} month={this.state.month} date={this.date}/>)
+      }
+    })
+    return td
   }
 }
 
